@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mapper.LinkMapper">
+
+    <resultMap id="LinkResult" type="com.pojo.LinkInfo">
+        <id property="linkId" column="LINK_ID"></id>
+        <result property="linkname" column="LINK_NAME"/>
+        <result property="link_url" column="LINK_URL"/>
+        <result property="link_order" column="LINK_ORDER"/>
+    </resultMap>
+
+    <insert id="addLink" parameterType="com.pojo.LinkInfo">
+        INSERT  INTO link_info
+        (LINK_NAME,LINK_URL,LINK_ORDER)
+        VALUES
+        (#{linkname} , #{link_url},#{link_order})
+    </insert>
+
+   <!-- 通过用户名获取ID-->
+    <select id="getLinkIdByName" resultType="Integer" parameterType="string">
+         SELECT LINK_ID FROM link_info
+         WHERE LINK_NAME = #{linkname}
+    </select>
+
+    <select id="selectLink" resultMap="LinkResult">
+         select * from link_info
+         <trim prefix="WHERE" prefixOverrides="AND|OR">
+             <if test="linkname != null and linkname != ''">AND LINK_NAME = #{linkname}</if>
+             <if test="link_url != null and link_url != ''">AND LINK_URL = #{link_url}</if>
+             <if test="link_order != null and link_order != ''">AND LINK_ORDER = #{link_order}</if>
+         </trim>
+    </select>
+
+    <select id="selectAllLink" resultMap="LinkResult">
+        select * from link_info
+        ORDER BY LINK_ORDER ASC
+    </select>
+
+    <delete id="deleteLink" parameterType="Integer" >
+        DELETE from link_info
+        WHERE LINK_ID IN
+        <foreach item="linkIds" collection="array" open="(" separator="," close=")">
+            #{linkIds}
+        </foreach>
+
+    </delete>
+
+    <update id="updateLink" parameterType="com.pojo.LinkInfo">
+        update link_info
+        <set>
+            <if test="linkname != null and linkname !=''"> LINK_NAME = #{linkname},</if>
+            <if test="link_url != null and link_url != ''"> LINK_URL = #{link_url},</if>
+            <if test="link_order != null and link_order != ''"> LINK_ORDER = #{link_order}</if>
+        </set>
+        WHERE LINK_ID = #{linkId}
+    </update>
+
+</mapper>
